@@ -1,5 +1,5 @@
 /* Future Me — Service Worker */
-const CACHE  = 'future-me-v2';
+const CACHE  = 'future-me-v3';
 const ASSETS = [
   'index.html',
   'manifest.json',
@@ -12,7 +12,7 @@ self.addEventListener('install', function (e) {
   e.waitUntil(
     caches.open(CACHE)
       .then(function (c) { return c.addAll(ASSETS); })
-      .then(function () { return self.skipWaiting(); })
+      .then(function ()  { return self.skipWaiting(); })
   );
 });
 
@@ -21,13 +21,13 @@ self.addEventListener('activate', function (e) {
     caches.keys().then(function (keys) {
       return Promise.all(
         keys.filter(function (k) { return k !== CACHE; })
-            .map(function (k)   { return caches.delete(k); })
+            .map(function (k)    { return caches.delete(k); })
       );
     }).then(function () { return self.clients.claim(); })
   );
 });
 
-/* Network-first: always try fresh, fall back to cache when offline */
+/* Network-first: fresh content when online, cache when offline */
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
   e.respondWith(
@@ -45,16 +45,17 @@ self.addEventListener('fetch', function (e) {
   );
 });
 
-/* Tapped a scheduled notification → open / focus the app */
+/* User tapped the notification → focus/open the app */
 self.addEventListener('notificationclick', function (e) {
   e.notification.close();
-  var messageId = e.notification.data && e.notification.data.messageId;
+  var timerId = e.notification.data && e.notification.data.timerId;
+
   e.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then(function (list) {
         if (list.length) {
           var c = list[0];
-          c.postMessage({ type: 'NOTIF_CLICKED', messageId: messageId });
+          c.postMessage({ type: 'NOTIF_CLICKED', timerId: timerId });
           return c.focus();
         }
         return self.clients.openWindow('./');
