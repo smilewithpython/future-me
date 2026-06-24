@@ -14,113 +14,161 @@
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:         #0b0c14;
-      --srf:        #12131f;
-      --srf2:       #1a1b2e;
-      --border:     rgba(255,255,255,0.07);
-      --amber:      #f59e0b;
-      --amber-dim:  rgba(245,158,11,0.13);
-      --amber-glow: rgba(245,158,11,0.22);
-      --green:      #10b981;
-      --green-dim:  rgba(16,185,129,0.12);
-      --red:        #f43f5e;
-      --text:       #e2e8f0;
-      --muted:      #64748b;
-      --bub-bg:     #181210;
-      --bub-text:   #ede0c8;
-      --bub-dim:    #7a6e5c;
+      --bg:        #0b0c14;
+      --srf:       #12131f;
+      --srf2:      #1a1b2e;
+      --border:    rgba(255,255,255,0.07);
+      --amber:     #f59e0b;
+      --adim:      rgba(245,158,11,0.13);
+      --aglow:     rgba(245,158,11,0.22);
+      --green:     #10b981;
+      --gdim:      rgba(16,185,129,0.14);
+      --red:       #f43f5e;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --bub:       #181210;
+      --bubt:      #ede0c8;
+      --bubd:      #7a6e5c;
     }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      min-height: 100dvh;
-      max-width: 460px;
-      margin: 0 auto;
-      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      min-height: 100dvh; max-width: 460px; margin: 0 auto;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom,0px));
       -webkit-font-smoothing: antialiased;
     }
 
     /* ── header ── */
     .hdr {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 16px 14px;
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 50;
-      background: var(--bg);
+      padding: 18px 16px 14px; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50; background: var(--bg);
     }
-    .hdr-left { display: flex; align-items: center; gap: 10px; }
     .brand { font-size: 19px; font-weight: 700; letter-spacing: -.4px; }
     .brand em { color: var(--amber); font-style: normal; }
-    .active-pill {
-      background: var(--amber-dim); border: 1px solid rgba(245,158,11,.3);
+    .hdr-right { display: flex; align-items: center; gap: 12px; }
+    .pill {
+      background: var(--adim); border: 1px solid rgba(245,158,11,.3);
       color: var(--amber); border-radius: 20px;
-      font-size: 12px; font-weight: 700;
-      padding: 3px 10px; display: none;
-    }
-    .active-pill.show { display: block; }
-    .notif-icon { font-size: 20px; cursor: pointer; opacity: .5; transition: opacity .2s; }
-    .notif-icon.on { opacity: 1; }
-
-    /* ── main content ── */
-    .content { padding: 14px 14px 0; }
-
-    /* ── banners ── */
-    .banner {
-      display: flex; align-items: center; gap: 10px;
-      border-radius: 12px; padding: 11px 13px; margin-bottom: 13px;
-      font-size: 13px; line-height: 1.4;
-    }
-    .banner.warn {
-      background: rgba(245,158,11,.1);
-      border: 1px solid rgba(245,158,11,.25);
-    }
-    .banner.install {
-      background: rgba(139,92,246,.1);
-      border: 1px solid rgba(139,92,246,.25);
+      font-size: 12px; font-weight: 700; padding: 3px 10px;
       display: none;
     }
-    .banner.install.show { display: flex; }
-    .b-icon { font-size: 20px; flex-shrink: 0; }
-    .b-text { flex: 1; }
-    .b-text strong { display: block; font-size: 13px; margin-bottom: 1px; }
-    .b-text small { font-size: 11px; color: var(--muted); }
-    .b-btn {
-      flex-shrink: 0; padding: 6px 13px;
-      background: var(--amber); color: var(--bg);
-      border: none; border-radius: 8px;
-      font-size: 12px; font-weight: 700;
-      cursor: pointer; font-family: inherit;
+    .pill.show { display: block; }
+    .gear-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 18px; opacity: .5; transition: opacity .2s; padding: 2px;
     }
-    .b-btn.purple { background: #7c3aed; color: #fff; }
+    .gear-btn:hover { opacity: 1; }
 
-    /* ── compose card ── */
+    /* ── screens ── */
+    .screen { display: none; padding: 16px; }
+    .screen.active { display: block; }
+
+    /* ── setup screen ── */
+    .setup-hero { text-align: center; padding: 24px 0 20px; }
+    .setup-hero .hero-icon { font-size: 52px; margin-bottom: 10px; }
+    .setup-hero h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .setup-hero p  { font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+    .step-card {
+      background: var(--srf); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; margin-bottom: 12px;
+    }
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--amber); color: var(--bg);
+      font-size: 12px; font-weight: 700; margin-bottom: 10px;
+    }
+    .step-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .step-card p  { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+
+    .ntfy-dl {
+      display: flex; gap: 8px;
+    }
+    .dl-btn {
+      flex: 1; padding: 10px 8px; border-radius: 10px;
+      background: var(--srf2); border: 1px solid var(--border);
+      color: var(--text); font-size: 13px; font-weight: 600;
+      text-align: center; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      transition: border-color .15s;
+    }
+    .dl-btn:hover { border-color: var(--amber); }
+
+    .topic-row { display: flex; gap: 8px; }
+    .topic-input {
+      flex: 1; background: var(--srf2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 14px;
+      padding: 10px 12px; font-family: 'SF Mono','Courier New',monospace;
+      outline: none; transition: border-color .2s;
+    }
+    .topic-input:focus { border-color: var(--amber); }
+    .regen-btn {
+      background: var(--srf2); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 10px; padding: 10px 13px;
+      font-size: 16px; cursor: pointer; transition: border-color .15s, color .15s;
+    }
+    .regen-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+    .sub-steps { margin-top: 8px; }
+    .sub-steps li {
+      font-size: 13px; color: var(--muted); padding: 4px 0 4px 20px;
+      position: relative; line-height: 1.45; list-style: none;
+    }
+    .sub-steps li::before { content: '→'; position: absolute; left: 0; color: var(--amber); }
+    .sub-steps code {
+      background: var(--srf2); color: var(--amber);
+      font-family: 'SF Mono','Courier New',monospace;
+      font-size: 12px; padding: 1px 6px; border-radius: 5px;
+    }
+
+    .test-btn {
+      width: 100%; padding: 13px; margin-top: 4px;
+      background: var(--srf2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 12px;
+      font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: border-color .15s, background .15s;
+    }
+    .test-btn:hover { border-color: var(--amber); background: var(--adim); }
+    .test-result {
+      text-align: center; font-size: 13px; margin-top: 8px;
+      min-height: 18px; color: var(--muted);
+    }
+    .test-result.ok  { color: var(--green); }
+    .test-result.err { color: var(--red); }
+
+    .done-btn {
+      width: 100%; padding: 15px; margin-top: 4px;
+      background: var(--amber); color: var(--bg);
+      border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+      box-shadow: 0 4px 20px var(--aglow);
+    }
+
+    /* ── main screen ── */
     .compose {
       background: var(--srf); border: 1px solid var(--border);
       border-radius: 16px; padding: 14px; margin-bottom: 14px;
     }
     .field-label {
       font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .1em; color: var(--muted); margin-bottom: 9px;
+      letter-spacing: .1em; color: var(--muted); margin-bottom: 8px;
     }
     textarea {
       width: 100%; background: rgba(255,255,255,.04);
       border: 1px solid var(--border); border-radius: 10px;
       color: var(--text); font-size: 15px; line-height: 1.55;
-      font-family: inherit; resize: none; min-height: 100px;
+      font-family: inherit; resize: none; min-height: 96px;
       padding: 10px 12px; outline: none; transition: border-color .2s;
     }
     textarea::placeholder { color: var(--muted); }
     textarea:focus { border-color: var(--amber); }
-    .char-row { text-align: right; font-size: 11px; color: var(--muted); margin-top: 5px; margin-bottom: 13px; }
+    .char-row { text-align: right; font-size: 11px; color: var(--muted); margin-top: 5px; margin-bottom: 12px; }
 
-    /* duration picks */
     .dur-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
-      margin-bottom: 10px;
+      display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-bottom: 10px;
     }
     .dp {
       background: var(--srf2); border: 1px solid var(--border);
@@ -129,14 +177,12 @@
     }
     .dp strong { display: block; font-size: 13px; color: var(--text); }
     .dp small  { display: block; font-size: 10px; color: var(--muted); margin-top: 1px; }
-    .dp:hover  { border-color: var(--amber); }
-    .dp.sel    { background: var(--amber-dim); border-color: var(--amber); }
+    .dp:hover, .dp.sel { background: var(--adim); border-color: var(--amber); }
     .dp.sel strong { color: var(--amber); }
-    .dp.sel small  { color: var(--amber); opacity: .7; }
+    .dp.sel small  { color: var(--amber); opacity:.7; }
 
-    /* custom duration row */
     .custom-row {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 13px;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
     }
     .custom-row label { font-size: 12px; color: var(--muted); white-space: nowrap; }
     .custom-row input {
@@ -145,8 +191,8 @@
       padding: 8px 10px; font-family: inherit; outline: none;
       transition: border-color .2s; -moz-appearance: textfield;
     }
-    .custom-row input::-webkit-outer-spin-button,
-    .custom-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .custom-row input::-webkit-inner-spin-button,
+    .custom-row input::-webkit-outer-spin-button { -webkit-appearance: none; }
     .custom-row input:focus { border-color: var(--amber); }
     .custom-row select {
       background: var(--srf2); border: 1px solid var(--border);
@@ -159,61 +205,62 @@
       width: 100%; padding: 15px;
       background: var(--amber); color: var(--bg);
       border: none; border-radius: 12px;
-      font-size: 15px; font-weight: 700;
-      cursor: pointer; font-family: inherit;
-      box-shadow: 0 4px 20px var(--amber-glow);
-      transition: transform .15s, box-shadow .15s;
+      font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+      box-shadow: 0 4px 20px var(--aglow);
+      transition: transform .15s;
     }
     .start-btn:active { transform: scale(.98); }
+
+    /* ntfy status bar */
+    .ntfy-bar {
+      display: flex; align-items: center; gap: 9px;
+      background: var(--gdim); border: 1px solid rgba(16,185,129,.25);
+      border-radius: 10px; padding: 9px 12px; margin-bottom: 13px;
+      font-size: 12px;
+    }
+    .ntfy-bar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .ntfy-bar span { flex: 1; color: var(--muted); }
+    .ntfy-bar code {
+      font-family: 'SF Mono','Courier New',monospace; font-size: 11px;
+      color: var(--green); background: rgba(16,185,129,.1);
+      padding: 2px 6px; border-radius: 5px;
+    }
 
     /* ── section headings ── */
     .sec-head {
       font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .1em; color: var(--muted);
-      margin: 18px 0 10px;
+      letter-spacing: .1em; color: var(--muted); margin: 16px 0 10px;
     }
 
-    /* ── timer card ── */
+    /* ── timer cards ── */
     .timer-card {
       background: var(--srf); border: 1px solid var(--border);
       border-radius: 14px; padding: 13px 14px; margin-bottom: 10px;
       position: relative; overflow: hidden;
     }
-    /* amber top stripe */
     .timer-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
       background: linear-gradient(90deg, var(--amber), #fb923c);
     }
-    .tc-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 8px;
-    }
+    .tc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 7px; }
     .tc-msg {
-      font-size: 14px; line-height: 1.45; flex: 1;
-      padding-right: 8px;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 14px; line-height: 1.45; flex: 1; padding-right: 8px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
     .tc-cancel {
-      background: none; border: none; color: var(--muted);
-      font-size: 17px; cursor: pointer; padding: 0 3px; line-height: 1;
-      transition: color .15s; flex-shrink: 0;
+      background: none; border: none; color: var(--muted); font-size: 17px;
+      cursor: pointer; padding: 0 3px; line-height: 1; transition: color .15s; flex-shrink: 0;
     }
     .tc-cancel:hover { color: var(--red); }
-    .tc-bottom {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 9px;
-    }
+    .tc-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
     .tc-label { font-size: 11px; color: var(--muted); }
     .tc-clock {
-      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 22px; font-weight: 700; color: var(--amber);
-      letter-spacing: -1px; line-height: 1;
+      font-family: 'SF Mono','Fira Code','Courier New',monospace;
+      font-size: 24px; font-weight: 700; color: var(--amber); letter-spacing: -1px; line-height:1;
     }
-    .tc-clock.urgent { color: var(--red); }
-
-    /* progress bar */
-    .tc-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 11px; overflow: hidden; }
+    .tc-clock.urgent { color: var(--red); animation: flicker 1s ease-in-out infinite; }
+    @keyframes flicker { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .tc-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
     .tc-fill {
       height: 100%; border-radius: 2px;
       background: linear-gradient(90deg, var(--amber), #fb923c);
@@ -222,132 +269,165 @@
 
     /* ── chat bubbles ── */
     .bubble-row {
-      display: flex; align-items: flex-end; gap: 9px;
-      margin-bottom: 14px;
+      display: flex; align-items: flex-end; gap: 9px; margin-bottom: 14px;
       animation: pop .35s cubic-bezier(.34,1.56,.64,1);
     }
     .av {
       width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-      background: var(--amber-dim); border: 1px solid rgba(245,158,11,.35);
+      background: var(--adim); border: 1px solid rgba(245,158,11,.35);
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; color: var(--amber);
-      margin-bottom: 2px;
+      font-size: 13px; font-weight: 700; color: var(--amber); margin-bottom: 2px;
     }
     .bubble-col { flex: 1; min-width: 0; }
     .bubble-name { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
     .bubble {
       display: inline-block; max-width: 100%;
-      background: var(--bub-bg);
-      border: 1px solid rgba(245,158,11,.15);
-      border-radius: 16px 16px 16px 3px;
-      padding: 10px 13px;
+      background: var(--bub); border: 1px solid rgba(245,158,11,.15);
+      border-radius: 16px 16px 16px 3px; padding: 10px 13px;
     }
     .bubble-text {
       font-family: Georgia, 'Times New Roman', serif;
-      font-size: 15px; line-height: 1.55;
-      color: var(--bub-text);
+      font-size: 15px; line-height: 1.55; color: var(--bubt);
       white-space: pre-wrap; word-break: break-word;
     }
-    .bubble-meta {
-      font-size: 11px; color: var(--bub-dim); margin-top: 6px;
-    }
-    .bubble-meta span { color: var(--green); }
-
-    /* delete bubble */
-    .bubble-del {
+    .bubble-meta { font-size: 11px; color: var(--bubd); margin-top: 6px; }
+    .bubble-meta .ck { color: var(--green); }
+    .del-btn {
       background: none; border: none; cursor: pointer; color: var(--muted);
-      font-size: 13px; padding: 4px; border-radius: 6px;
-      opacity: 0; transition: opacity .2s, color .15s;
-      align-self: center; flex-shrink: 0;
+      font-size: 14px; padding: 4px; border-radius: 6px;
+      opacity: 0; transition: opacity .2s, color .15s; align-self: center; flex-shrink: 0;
     }
-    .bubble-row:hover .bubble-del { opacity: 1; }
-    .bubble-del:hover { color: var(--red); }
+    .bubble-row:hover .del-btn { opacity: 1; }
+    .del-btn:hover { color: var(--red); }
 
-    /* ── empty state ── */
+    /* ── empty ── */
     .empty { text-align: center; padding: 32px 20px; }
-    .empty-icon { font-size: 36px; margin-bottom: 10px; }
+    .empty .ei { font-size: 38px; margin-bottom: 10px; }
     .empty h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
     .empty p  { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
     /* ── toast ── */
     .toast {
       position: fixed;
-      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-      left: 50%; transform: translateX(-50%) translateY(12px);
-      background: var(--bub-bg); border: 1px solid var(--green);
+      bottom: calc(16px + env(safe-area-inset-bottom,0px));
+      left:50%; transform: translateX(-50%) translateY(12px);
+      background: var(--bub); border: 1px solid var(--green);
       border-radius: 14px; padding: 12px 15px;
       max-width: calc(100% - 28px); min-width: 240px;
-      opacity: 0; transition: opacity .3s, transform .35s cubic-bezier(.34,1.56,.64,1);
-      z-index: 200; box-shadow: 0 8px 28px rgba(0,0,0,.5); pointer-events: none;
+      opacity:0; transition: opacity .3s, transform .35s cubic-bezier(.34,1.56,.64,1);
+      z-index:200; box-shadow: 0 8px 28px rgba(0,0,0,.5); pointer-events:none;
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast-from { font-size: 11px; font-weight: 700; color: var(--green); margin-bottom: 3px; }
+    .toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+    .toast-from { font-size:11px; font-weight:700; color:var(--green); margin-bottom:3px; }
     .toast-msg  {
-      font-family: Georgia, serif; font-size: 14px;
-      color: var(--bub-text); line-height: 1.45;
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-family: Georgia, serif; font-size:14px; color:var(--bubt); line-height:1.45;
+      display: -webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
     }
 
-    /* ── animations ── */
     @keyframes pop {
       from { opacity:0; transform:scale(.93) translateY(6px); }
-      to   { opacity:1; transform:scale(1)  translateY(0);    }
+      to   { opacity:1; transform:scale(1)   translateY(0); }
     }
   </style>
 </head>
 <body>
 
-<!-- header -->
 <div class="hdr">
-  <div class="hdr-left">
-    <div class="brand">Future <em>Me</em></div>
-    <div class="active-pill" id="activePill">0 active</div>
+  <div class="brand">Future <em>Me</em></div>
+  <div class="hdr-right">
+    <div class="pill" id="pill">0 active</div>
+    <button class="gear-btn" onclick="showSetup()" title="Setup / Change topic">⚙️</button>
   </div>
-  <div class="notif-icon" id="notifIcon" onclick="askNotif()" title="Enable notifications">🔔</div>
 </div>
 
-<div class="content">
+<!-- ══════════════════════════════════════
+     SETUP SCREEN
+══════════════════════════════════════ -->
+<div class="screen active" id="scSetup">
 
-  <!-- notification banner -->
-  <div class="banner warn" id="notifBanner" style="display:none">
-    <span class="b-icon">🔔</span>
-    <div class="b-text">
-      <strong>Enable notifications</strong>
-      <small>Get the message even when this tab is closed</small>
-    </div>
-    <button class="b-btn" onclick="askNotif()">Enable</button>
+  <div class="setup-hero">
+    <div class="hero-icon">📲</div>
+    <h2>Set up real notifications</h2>
+    <p>Web apps can't ring a locked phone — but ntfy can.<br>It's a free app that delivers messages like a real text.</p>
   </div>
 
-  <!-- install banner -->
-  <div class="banner install" id="installBanner">
-    <span class="b-icon">📲</span>
-    <div class="b-text">
-      <strong>Add to Home Screen</strong>
-      <small>Background delivery works much better as an installed app</small>
+  <!-- Step 1 -->
+  <div class="step-card">
+    <div class="step-num">1</div>
+    <h3>Install ntfy on your phone</h3>
+    <p>It's free. No account required.</p>
+    <div class="ntfy-dl">
+      <a class="dl-btn" href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank">▶ Google Play</a>
+      <a class="dl-btn" href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank"> Apple App Store</a>
     </div>
-    <button class="b-btn purple" onclick="doInstall()">Install</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-card">
+    <div class="step-num">2</div>
+    <h3>Pick your private channel name</h3>
+    <p>This is a random name only you'll know. Anyone who guesses it could also subscribe, so keep it unusual.</p>
+    <div class="topic-row">
+      <input class="topic-input" id="topicInput" type="text" placeholder="futureme-abc123" oninput="onTopicInput()">
+      <button class="regen-btn" onclick="genTopic()" title="Generate new random name">🎲</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-card">
+    <div class="step-num">3</div>
+    <h3>Subscribe to your channel in ntfy</h3>
+    <p>Open the ntfy app on your phone, then:</p>
+    <ul class="sub-steps">
+      <li>Tap the <strong>+</strong> button in the top-right</li>
+      <li>Paste your channel name: <code id="topicPreview">futureme-…</code></li>
+      <li>Tap <strong>Subscribe</strong></li>
+      <li>Allow notifications when asked</li>
+    </ul>
+  </div>
+
+  <!-- Step 4 — test -->
+  <div class="step-card">
+    <div class="step-num">4</div>
+    <h3>Send a test notification</h3>
+    <p>Make sure a notification arrives on your phone before you rely on it.</p>
+    <button class="test-btn" onclick="sendTest()">🔔 Send Test Notification Now</button>
+    <div class="test-result" id="testResult"></div>
+  </div>
+
+  <button class="done-btn" onclick="finishSetup()">✓ Done — Let's Go</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="scMain">
+
+  <!-- ntfy status bar -->
+  <div class="ntfy-bar">
+    <div class="dot"></div>
+    <span>Sending via ntfy to</span>
+    <code id="topicDisplay">–</code>
   </div>
 
   <!-- compose -->
   <div class="compose">
     <div class="field-label">Your message</div>
-    <textarea id="msgTxt" placeholder="You've been sitting for an hour. Stand up." maxlength="500" oninput="onInput()"></textarea>
-    <div class="char-row"><span id="charLeft">500</span> characters left</div>
+    <textarea id="msgTxt" placeholder="You've been sitting for 30 minutes. Go walk around." maxlength="500" oninput="onInput()"></textarea>
+    <div class="char-row"><span id="charLeft">500</span> left</div>
 
     <div class="field-label">Send it in…</div>
     <div class="dur-grid">
-      <button class="dp" onclick="pickDur(this,5)"    data-min="5">    <strong>5m</strong>  <small>five</small>      </button>
-      <button class="dp sel" onclick="pickDur(this,15)"   data-min="15">   <strong>15m</strong> <small>fifteen</small>  </button>
-      <button class="dp" onclick="pickDur(this,30)"   data-min="30">   <strong>30m</strong> <small>half hr</small>  </button>
-      <button class="dp" onclick="pickDur(this,60)"   data-min="60">   <strong>1hr</strong> <small>one hr</small>   </button>
-      <button class="dp" onclick="pickDur(this,120)"  data-min="120">  <strong>2hr</strong> <small>two hrs</small>  </button>
+      <button class="dp"     onclick="pickDur(this,5)"   data-m="5">   <strong>5m</strong>  <small>five</small>    </button>
+      <button class="dp sel" onclick="pickDur(this,15)"  data-m="15">  <strong>15m</strong> <small>fifteen</small> </button>
+      <button class="dp"     onclick="pickDur(this,30)"  data-m="30">  <strong>30m</strong> <small>half hr</small> </button>
+      <button class="dp"     onclick="pickDur(this,60)"  data-m="60">  <strong>1hr</strong> <small>one hr</small>  </button>
+      <button class="dp"     onclick="pickDur(this,120)" data-m="120"> <strong>2hr</strong> <small>two hrs</small> </button>
     </div>
-
     <div class="custom-row">
       <label>or</label>
-      <input type="number" id="custMin" placeholder="45" min="1" max="1440" oninput="onCustomDur()">
-      <select id="custUnit" onchange="onCustomDur()">
+      <input type="number" id="custMin" placeholder="45" min="1" max="1440" oninput="onCust()">
+      <select id="custUnit" onchange="onCust()">
         <option value="1">minutes</option>
         <option value="60">hours</option>
       </select>
@@ -357,18 +437,18 @@
   </div>
 
   <!-- active timers -->
-  <div id="activeSection" style="display:none">
+  <div id="aSection" style="display:none">
     <div class="sec-head">Active timers</div>
     <div id="timerList"></div>
   </div>
 
-  <!-- message history -->
-  <div id="histSection" style="display:none">
+  <!-- history -->
+  <div id="hSection">
     <div class="sec-head">Delivered messages</div>
     <div id="bubbleList"></div>
   </div>
 
-</div><!-- /content -->
+</div><!-- /scMain -->
 
 <!-- toast -->
 <div class="toast" id="toast">
@@ -377,343 +457,317 @@
 </div>
 
 <script>
-/* ════════════════════════════════════════
+/* ══════════════════════════════════════════
    STORAGE
-════════════════════════════════════════ */
-const SK = 'futureMe_tmr_v1';
-function load()        { try { return JSON.parse(localStorage.getItem(SK)||'[]'); } catch{ return []; } }
-function save(a)       { localStorage.setItem(SK, JSON.stringify(a)); }
-function add(t)        { const a=load(); a.push(t); save(a); }
-function remove(id)    { save(load().filter(x=>x.id!==id)); }
-function deliver(id)   {
-  const a=load(), i=a.findIndex(x=>x.id===id);
+══════════════════════════════════════════ */
+function getTopic()    { return localStorage.getItem('fm_topic') || ''; }
+function saveTopic(t)  { localStorage.setItem('fm_topic', t.trim()); }
+function getTimers()   { try { return JSON.parse(localStorage.getItem('fm_timers')||'[]'); } catch { return []; } }
+function saveTimers(a) { localStorage.setItem('fm_timers', JSON.stringify(a)); }
+function addTimer(t)   { const a=getTimers(); a.push(t); saveTimers(a); }
+function removeTimer(id){ saveTimers(getTimers().filter(x=>x.id!==id)); }
+function deliverTimer(id){
+  const a=getTimers(), i=a.findIndex(x=>x.id===id);
   if(i<0||a[i].delivered) return null;
-  a[i].delivered=true; a[i].deliveredAt=Date.now(); save(a); return a[i];
+  a[i].delivered=true; a[i].deliveredAt=Date.now(); saveTimers(a); return a[i];
 }
 
-/* ════════════════════════════════════════
+/* ══════════════════════════════════════════
    STATE
-════════════════════════════════════════ */
-let durMs     = 15*60*1000;   // default 15 min
-let installEv = null;
-let tickId    = null;
+══════════════════════════════════════════ */
+let durMs = 15*60*1000;
 
-/* ════════════════════════════════════════
-   INIT
-════════════════════════════════════════ */
-function init() {
-  registerSW();
-  checkNotifState();
-  checkDeliveries();
+/* ══════════════════════════════════════════
+   NTFY
+══════════════════════════════════════════ */
+async function sendNtfy(topic, title, message, priority) {
+  priority = priority || 4;   // 4=high (sound+vibrate), 5=max (breaks DND)
+  const resp = await fetch('https://ntfy.sh/' + topic, {
+    method: 'POST',
+    headers: {
+      'Title':    title,
+      'Priority': String(priority),
+      'Tags':     'alarm,hourglass_flowing_sand',
+    },
+    body: message,
+  });
+  if (!resp.ok) throw new Error('ntfy returned ' + resp.status);
+  return resp;
+}
+
+/* ══════════════════════════════════════════
+   SETUP SCREEN
+══════════════════════════════════════════ */
+function randTopic() {
+  const words = ['amber','echo','nova','pixel','solar','pulse','forge','drift',
+                 'cedar','flint','oak','storm','wave','ridge','crest'];
+  const w1 = words[Math.floor(Math.random()*words.length)];
+  const w2 = words[Math.floor(Math.random()*words.length)];
+  const n  = Math.floor(1000+Math.random()*9000);
+  return 'futureme-'+w1+w2+n;
+}
+
+function genTopic() {
+  const t = randTopic();
+  document.getElementById('topicInput').value = t;
+  document.getElementById('topicPreview').textContent = t;
+}
+
+function onTopicInput() {
+  const v = document.getElementById('topicInput').value.trim();
+  document.getElementById('topicPreview').textContent = v || 'futureme-…';
+}
+
+async function sendTest() {
+  const topic = document.getElementById('topicInput').value.trim();
+  const res   = document.getElementById('testResult');
+  if (!topic) { res.className='test-result err'; res.textContent='Enter a channel name first.'; return; }
+  res.className='test-result'; res.textContent='Sending…';
+  try {
+    await sendNtfy(topic, '🔔 Future Me test', 'It works! Your timer messages will arrive here.', 4);
+    res.className='test-result ok'; res.textContent='✓ Sent! Check your ntfy app.';
+  } catch(e) {
+    res.className='test-result err'; res.textContent='✗ Failed: '+e.message+'. Check your internet connection.';
+  }
+}
+
+function finishSetup() {
+  const topic = document.getElementById('topicInput').value.trim();
+  if (!topic) { alert('Enter a channel name first.'); return; }
+  saveTopic(topic);
+  showMain();
+}
+
+function showSetup() {
+  document.getElementById('topicInput').value = getTopic() || randTopic();
+  onTopicInput();
+  document.getElementById('scSetup').classList.add('active');
+  document.getElementById('scMain').classList.remove('active');
+}
+
+function showMain() {
+  document.getElementById('topicDisplay').textContent = getTopic();
+  document.getElementById('scSetup').classList.remove('active');
+  document.getElementById('scMain').classList.add('active');
   render();
-  tickId = setInterval(tick, 1000);
-
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault(); installEv = e;
-    document.getElementById('installBanner').classList.add('show');
-  });
-
-  navigator.serviceWorker?.addEventListener('message', e => {
-    if (e.data?.type === 'NOTIF_CLICKED') {
-      const t = deliver(e.data.timerId);
-      if (t) { render(); showToast(t.text); }
-    }
-  });
-
-  // When tab becomes visible again, re-check deliveries
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) checkDeliveries();
-  });
 }
 
-/* ════════════════════════════════════════
-   SERVICE WORKER
-════════════════════════════════════════ */
-async function registerSW() {
-  if (!('serviceWorker' in navigator)) return;
-  try { await navigator.serviceWorker.register('./sw.js'); }
-  catch(e) { console.warn('SW failed:', e); }
-}
-
-/* ════════════════════════════════════════
-   NOTIFICATIONS
-════════════════════════════════════════ */
-function checkNotifState() {
-  if (!('Notification' in window)) return;
-  const granted = Notification.permission === 'granted';
-  document.getElementById('notifBanner').style.display = granted ? 'none' : 'flex';
-  document.getElementById('notifIcon').classList.toggle('on', granted);
-}
-
-async function askNotif() {
-  if (!('Notification' in window)) { alert('Notifications not supported in this browser.'); return; }
-  const p = await Notification.requestPermission();
-  checkNotifState();
-  if (p === 'granted') showToast('Notifications on — you\'ll get the message even if this tab is in the background.');
-}
-
-async function scheduleNotif(timer) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return 'no-permission';
-
-  const reg = await navigator.serviceWorker?.ready.catch(() => null);
-
-  /* ① Notification Triggers API — fires even when Chrome is closed */
-  if (reg && 'TimestampTrigger' in window) {
-    try {
-      await reg.showNotification('⏰ Past You', {
-        body:        timer.text,
-        tag:         timer.id,
-        data:        { timerId: timer.id },
-        showTrigger: new TimestampTrigger(timer.deliverAt),
-        vibrate:     [150, 80, 150],
-        requireInteraction: false,
-        icon:  './icon-192.png',
-        badge: './icon-192.png',
-      });
-      return 'trigger';
-    } catch(e) { console.warn('TimestampTrigger:', e); }
-  }
-
-  /* ② setTimeout — works while tab is alive (backgrounded browser counts) */
-  const delay = timer.deliverAt - Date.now();
-  if (delay > 0) {
-    setTimeout(() => fireTimer(timer.id), delay);
-    return 'settimeout';
-  }
-
-  return 'missed';
-}
-
-async function cancelNotif(id) {
-  const reg = await navigator.serviceWorker?.ready.catch(() => null);
-  if (!reg) return;
-  const list = await reg.getNotifications({ tag: id }).catch(() => []);
-  list.forEach(n => n.close());
-}
-
-/* ════════════════════════════════════════
+/* ══════════════════════════════════════════
    TIMER LOGIC
-════════════════════════════════════════ */
+══════════════════════════════════════════ */
 async function startTimer() {
-  const text = document.getElementById('msgTxt').value.trim();
+  const text  = document.getElementById('msgTxt').value.trim();
   if (!text) { shake(); return; }
+  const topic = getTopic();
+  if (!topic) { showSetup(); return; }
 
   const timer = {
-    id:          Date.now().toString(36) + Math.random().toString(36).slice(2),
+    id:          Date.now().toString(36)+Math.random().toString(36).slice(2),
     text,
     duration:    durMs,
     startedAt:   Date.now(),
-    deliverAt:   Date.now() + durMs,
+    deliverAt:   Date.now()+durMs,
     delivered:   false,
     deliveredAt: null,
   };
 
-  add(timer);
-  const method = await scheduleNotif(timer);
-  console.log('Scheduled via:', method);
-
-  document.getElementById('msgTxt').value = '';
-  document.getElementById('charLeft').textContent = '500';
+  addTimer(timer);
+  document.getElementById('msgTxt').value='';
+  document.getElementById('charLeft').textContent='500';
   render();
+
+  // Schedule delivery via setTimeout — sends ntfy when time is up
+  setTimeout(function(){ fireTimer(timer.id); }, durMs);
 }
 
-function fireTimer(id) {
-  const t = deliver(id);
-  if (!t) return;
+async function fireTimer(id) {
+  const t = deliverTimer(id);
+  if (!t) return;          // already delivered or deleted
   render();
   showToast(t.text);
-  /* show system notif if tab is hidden (fallback path) */
-  if (document.hidden && Notification.permission === 'granted') {
-    new Notification('⏰ Past You', {
-      body: t.text, tag: id,
-      icon: './icon-192.png',
-      vibrate: [150, 80, 150],
-    });
+
+  const topic = getTopic();
+  if (topic) {
+    try {
+      await sendNtfy(
+        topic,
+        '⏰ Past You (' + fmtDur(t.duration) + ' ago)',
+        t.text,
+        4
+      );
+    } catch(e) { console.warn('ntfy send failed:', e); }
   }
 }
 
 function checkDeliveries() {
   const now = Date.now();
-  load()
+  getTimers()
     .filter(t => !t.delivered && t.deliverAt <= now)
     .forEach(t => {
-      const done = deliver(t.id);
-      if (done) showToast(done.text);
+      deliverTimer(t.id);
+      render();
     });
-  render();
 }
 
 async function cancelTimer(id) {
-  remove(id);
-  await cancelNotif(id);
-  render();
+  removeTimer(id); render();
 }
 
-function deleteMsg(id) { remove(id); render(); }
+function deleteMsg(id) { removeTimer(id); render(); }
 
-/* ════════════════════════════════════════
-   TICK (every second)
-════════════════════════════════════════ */
-function tick() {
-  checkDeliveries();
-  updateClocks();
-}
-
-/* ════════════════════════════════════════
-   UI — duration picker
-════════════════════════════════════════ */
-function pickDur(btn, min) {
-  document.querySelectorAll('.dp').forEach(b => b.classList.remove('sel'));
-  btn.classList.add('sel');
-  durMs = min * 60 * 1000;
-  document.getElementById('custMin').value = '';
-}
-
-function onCustomDur() {
-  const v    = parseInt(document.getElementById('custMin').value, 10);
-  const unit = parseInt(document.getElementById('custUnit').value, 10);
-  if (!v || v < 1) return;
-  document.querySelectorAll('.dp').forEach(b => b.classList.remove('sel'));
-  durMs = v * unit * 60 * 1000;
-}
-
-function onInput() {
-  document.getElementById('charLeft').textContent = 500 - document.getElementById('msgTxt').value.length;
-}
-
-function shake() {
-  const el = document.getElementById('msgTxt');
-  el.style.outline = '2px solid var(--red)'; el.focus();
-  setTimeout(() => el.style.outline = '', 800);
-}
-
-function doInstall() {
-  if (!installEv) return;
-  installEv.prompt();
-  installEv.userChoice.then(() => { installEv = null; document.getElementById('installBanner').classList.remove('show'); });
-}
-
-/* ════════════════════════════════════════
+/* ══════════════════════════════════════════
    RENDER
-════════════════════════════════════════ */
+══════════════════════════════════════════ */
 const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 function render() {
-  const all       = load();
-  const now       = Date.now();
-  const active    = all.filter(t => !t.delivered && t.deliverAt > now).sort((a,b)=>a.deliverAt-b.deliverAt);
-  const delivered = all.filter(t =>  t.delivered).sort((a,b)=>b.deliveredAt-a.deliveredAt);
+  const all  = getTimers(), now = Date.now();
+  const active    = all.filter(t=>!t.delivered && t.deliverAt>now).sort((a,b)=>a.deliverAt-b.deliverAt);
+  const delivered = all.filter(t=> t.delivered).sort((a,b)=>b.deliveredAt-a.deliveredAt);
 
-  /* active pill */
-  const pill = document.getElementById('activePill');
-  pill.textContent = active.length + (active.length===1?' active':' active');
-  pill.classList.toggle('show', active.length > 0);
+  const pill = document.getElementById('pill');
+  pill.textContent = active.length+(active.length===1?' active':' active');
+  pill.classList.toggle('show', active.length>0);
 
-  /* timers */
-  const aSection = document.getElementById('activeSection');
-  const tList    = document.getElementById('timerList');
-  aSection.style.display = active.length ? 'block' : 'none';
-  tList.innerHTML = active.map(t => {
-    const pct = Math.max(0, Math.min(100, ((t.deliverAt - now) / t.duration) * 100));
-    return `
-      <div class="timer-card" id="tc-${t.id}">
-        <div class="tc-top">
-          <div class="tc-msg">${esc(t.text)}</div>
-          <button class="tc-cancel" onclick="cancelTimer('${t.id}')" title="Cancel">✕</button>
-        </div>
-        <div class="tc-bottom">
-          <span class="tc-label">fires in</span>
-          <span class="tc-clock" id="clk-${t.id}">${fmtCountdown(t.deliverAt - now)}</span>
-        </div>
-        <div class="tc-bar"><div class="tc-fill" id="bar-${t.id}" style="width:${pct}%"></div></div>
-      </div>`;
+  // active timers
+  const aS = document.getElementById('aSection');
+  const tL = document.getElementById('timerList');
+  aS.style.display = active.length ? 'block' : 'none';
+  tL.innerHTML = active.map(t=>{
+    const pct = Math.max(0,Math.min(100, (t.deliverAt-now)/t.duration*100));
+    return `<div class="timer-card" id="tc-${t.id}">
+      <div class="tc-top">
+        <div class="tc-msg">${esc(t.text)}</div>
+        <button class="tc-cancel" onclick="cancelTimer('${t.id}')">✕</button>
+      </div>
+      <div class="tc-bottom">
+        <span class="tc-label">fires in</span>
+        <span class="tc-clock" id="clk-${t.id}">${fmtCountdown(t.deliverAt-now)}</span>
+      </div>
+      <div class="tc-bar"><div class="tc-fill" id="bar-${t.id}" style="width:${pct}%"></div></div>
+    </div>`;
   }).join('');
 
-  /* bubbles */
-  const hSection = document.getElementById('histSection');
-  const bList    = document.getElementById('bubbleList');
-  hSection.style.display = delivered.length ? 'block' : 'none';
-  bList.innerHTML = delivered.map(t => `
-    <div class="bubble-row">
-      <div class="av">P</div>
-      <div class="bubble-col">
-        <div class="bubble-name">Past You · ${fmtDur(t.duration)}</div>
-        <div class="bubble">
-          <div class="bubble-text">${esc(t.text)}</div>
-          <div class="bubble-meta"><span>✓</span> ${fmtAgo(t.deliveredAt)}</div>
-        </div>
-      </div>
-      <button class="bubble-del" onclick="deleteMsg('${t.id}')" title="Delete">✕</button>
-    </div>`
-  ).join('');
-
-  if (!active.length && !delivered.length) {
-    hSection.style.display = 'block';
-    bList.innerHTML = `<div class="empty">
-      <div class="empty-icon">⏱️</div>
+  // bubbles
+  const bL = document.getElementById('bubbleList');
+  if (!delivered.length) {
+    bL.innerHTML=`<div class="empty"><div class="ei">💬</div>
       <h3>No messages yet</h3>
-      <p>Write something, set a timer, and it'll arrive as a notification — like a text from your past self.</p>
-    </div>`;
+      <p>Write something, start a timer, and it'll arrive on your phone like a text — even when locked.</p></div>`;
+  } else {
+    bL.innerHTML = delivered.map(t=>`
+      <div class="bubble-row">
+        <div class="av">P</div>
+        <div class="bubble-col">
+          <div class="bubble-name">Past You · ${fmtDur(t.duration)}</div>
+          <div class="bubble">
+            <div class="bubble-text">${esc(t.text)}</div>
+            <div class="bubble-meta"><span class="ck">✓✓</span> ${fmtAgo(t.deliveredAt)}</div>
+          </div>
+        </div>
+        <button class="del-btn" onclick="deleteMsg('${t.id}')">✕</button>
+      </div>`).join('');
   }
 }
 
-/* update only the clock + bar without a full re-render */
 function updateClocks() {
   const now = Date.now();
-  load().filter(t => !t.delivered).forEach(t => {
+  getTimers().filter(t=>!t.delivered).forEach(t=>{
     const rem = t.deliverAt - now;
-    const clk = document.getElementById(`clk-${t.id}`);
-    const bar = document.getElementById(`bar-${t.id}`);
-    if (clk) {
-      clk.textContent = rem > 0 ? fmtCountdown(rem) : '0:00';
-      clk.classList.toggle('urgent', rem < 60000);
-    }
-    if (bar) {
-      const pct = Math.max(0, Math.min(100, (rem / t.duration) * 100));
-      bar.style.width = pct + '%';
-    }
+    const clk = document.getElementById('clk-'+t.id);
+    const bar = document.getElementById('bar-'+t.id);
+    if (clk) { clk.textContent = rem>0 ? fmtCountdown(rem) : '0:00'; clk.classList.toggle('urgent', rem<60000); }
+    if (bar) { bar.style.width = Math.max(0,Math.min(100,rem/t.duration*100))+'%'; }
   });
 }
 
-/* ════════════════════════════════════════
+/* ══════════════════════════════════════════
+   UI HELPERS
+══════════════════════════════════════════ */
+function pickDur(btn, min) {
+  document.querySelectorAll('.dp').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  durMs = min*60000;
+  document.getElementById('custMin').value='';
+}
+function onCust() {
+  const v=parseInt(document.getElementById('custMin').value,10);
+  const u=parseInt(document.getElementById('custUnit').value,10);
+  if(!v||v<1) return;
+  document.querySelectorAll('.dp').forEach(b=>b.classList.remove('sel'));
+  durMs = v*u*60000;
+}
+function onInput() {
+  document.getElementById('charLeft').textContent = 500-document.getElementById('msgTxt').value.length;
+}
+function shake() {
+  const el=document.getElementById('msgTxt');
+  el.style.outline='2px solid var(--red)'; el.focus();
+  setTimeout(()=>el.style.outline='',800);
+}
+
+/* ══════════════════════════════════════════
    FORMATTERS
-════════════════════════════════════════ */
+══════════════════════════════════════════ */
 function fmtCountdown(ms) {
-  if (ms <= 0) return '0:00';
-  const s = Math.floor(ms / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  const mm = String(m).padStart(2,'0');
-  const ss = String(sec).padStart(2,'0');
-  return h > 0 ? `${h}:${mm}:${ss}` : `${m}:${ss}`;
+  if(ms<=0) return '0:00';
+  const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  const mm=String(m).padStart(2,'0'), ss=String(sec).padStart(2,'0');
+  return h>0 ? h+':'+mm+':'+ss : m+':'+ss;
 }
-
 function fmtDur(ms) {
-  const m = Math.round(ms / 60000);
-  if (m < 60) return `${m} min`;
-  const h = Math.floor(m / 60), rm = m % 60;
-  return rm ? `${h}h ${rm}m` : `${h}h`;
+  const m=Math.round(ms/60000);
+  if(m<60) return m+'m';
+  const h=Math.floor(m/60), r=m%60;
+  return r ? h+'h '+r+'m' : h+'h';
 }
-
 function fmtAgo(ts) {
-  const s = (Date.now() - ts) / 1000;
-  if (s < 60)    return 'just now';
-  if (s < 3600)  return `${Math.floor(s/60)}m ago`;
-  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
-  return `${Math.floor(s/86400)}d ago`;
+  const s=(Date.now()-ts)/1000;
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
 }
 
-/* ════════════════════════════════════════
+/* ══════════════════════════════════════════
    TOAST
-════════════════════════════════════════ */
+══════════════════════════════════════════ */
 let toastTmr;
 function showToast(msg) {
   document.getElementById('toastMsg').textContent = msg;
-  const el = document.getElementById('toast');
+  const el=document.getElementById('toast');
   el.classList.add('show');
   clearTimeout(toastTmr);
-  toastTmr = setTimeout(() => el.classList.remove('show'), 5000);
+  toastTmr = setTimeout(()=>el.classList.remove('show'),5000);
+}
+
+/* ══════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════ */
+function init() {
+  const topic = getTopic();
+  if (topic) {
+    showMain();
+  } else {
+    genTopic();   // pre-fill with a random topic
+  }
+
+  // Re-schedule setTimeouts for any active timers (page reload recovery)
+  const now = Date.now();
+  getTimers().filter(t=>!t.delivered).forEach(t=>{
+    const delay = t.deliverAt - now;
+    if(delay>0) setTimeout(()=>fireTimer(t.id), delay);
+    else        fireTimer(t.id);  // overdue
+  });
+
+  setInterval(function(){ checkDeliveries(); updateClocks(); }, 1000);
+
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkDeliveries(); });
+}
+
+// Register service worker for PWA install support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
 
 init();
