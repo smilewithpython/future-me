@@ -482,14 +482,17 @@ let durMs = 15*60*1000;
 ══════════════════════════════════════════ */
 async function sendNtfy(topic, title, message, priority) {
   priority = priority || 4;   // 4=high (sound+vibrate), 5=max (breaks DND)
-  const resp = await fetch('https://ntfy.sh/' + topic, {
+  // Use JSON body — HTTP headers cannot contain emoji (ISO 8859-1 only)
+  const resp = await fetch('https://ntfy.sh/', {
     method: 'POST',
-    headers: {
-      'Title':    title,
-      'Priority': String(priority),
-      'Tags':     'alarm,hourglass_flowing_sand',
-    },
-    body: message,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      topic:    topic,
+      title:    title,
+      message:  message,
+      priority: priority,
+      tags:     ['alarm', 'hourglass_flowing_sand'],
+    }),
   });
   if (!resp.ok) throw new Error('ntfy returned ' + resp.status);
   return resp;
