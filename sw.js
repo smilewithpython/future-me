@@ -1,5 +1,5 @@
 /* Future Me — Service Worker */
-const CACHE  = 'future-me-v3';
+const CACHE  = 'future-me-v5';
 const ASSETS = [
   'index.html',
   'manifest.json',

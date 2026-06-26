@@ -480,21 +480,32 @@ let durMs = 15*60*1000;
 /* ══════════════════════════════════════════
    NTFY
 ══════════════════════════════════════════ */
-async function sendNtfy(topic, title, message, priority) {
-  priority = priority || 4;   // 4=high (sound+vibrate), 5=max (breaks DND)
-  // Use JSON body — HTTP headers cannot contain emoji (ISO 8859-1 only)
-  const resp = await fetch('https://ntfy.sh/', {
+async function sendNtfy(topic, title, message, priority, delaySeconds) {
+  priority = priority || 4;
+  // Strip anything non-ASCII from title — safest approach for all browsers
+  var safeTitle = title.replace(/[^\x20-\x7E]/g, '').trim() || 'Future Me';
+  var payload = {
+    topic:    topic,
+    title:    safeTitle,
+    message:  message,
+    priority: priority,
+  };
+  // Server-side scheduled delivery: ntfy holds the message and delivers it
+  // later — works even if the browser is closed and the phone is locked.
+  // ntfy supports delays from 10s up to 3 days.
+  if (delaySeconds && delaySeconds >= 10) {
+    payload.delay = String(delaySeconds) + 's';
+  }
+  var resp = await fetch('https://ntfy.sh/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      topic:    topic,
-      title:    title,
-      message:  message,
-      priority: priority,
-      tags:     ['alarm', 'hourglass_flowing_sand'],
-    }),
+    body: JSON.stringify(payload),
   });
-  if (!resp.ok) throw new Error('ntfy returned ' + resp.status);
+  if (!resp.ok) {
+    var detail = '';
+    try { detail = ' - ' + (await resp.text()); } catch(e) {}
+    throw new Error('ntfy error ' + resp.status + detail);
+  }
   return resp;
 }
 
@@ -527,7 +538,7 @@ async function sendTest() {
   if (!topic) { res.className='test-result err'; res.textContent='Enter a channel name first.'; return; }
   res.className='test-result'; res.textContent='Sending…';
   try {
-    await sendNtfy(topic, '🔔 Future Me test', 'It works! Your timer messages will arrive here.', 4);
+    await sendNtfy(topic, 'Future Me - Test', 'It works! Your timer messages will arrive here.', 4);
     res.className='test-result ok'; res.textContent='✓ Sent! Check your ntfy app.';
   } catch(e) {
     res.className='test-result err'; res.textContent='✗ Failed: '+e.message+'. Check your internet connection.';
@@ -564,6 +575,13 @@ async function startTimer() {
   const topic = getTopic();
   if (!topic) { showSetup(); return; }
 
+  const btn = document.querySelector('.start-btn');
+  const origLabel = btn.textContent;
+  btn.textContent = 'Scheduling…';
+  btn.disabled = true;
+
+  const delaySec = Math.round(durMs / 1000);
+
   const timer = {
     id:          Date.now().toString(36)+Math.random().toString(36).slice(2),
     text,
@@ -572,34 +590,47 @@ async function startTimer() {
     deliverAt:   Date.now()+durMs,
     delivered:   false,
     deliveredAt: null,
+    scheduled:   false,   // did ntfy accept the server-side delay?
   };
+
+  // Send to ntfy NOW with a server-side delay. ntfy holds it and delivers
+  // at the right time — phone can be locked, browser closed, doesn't matter.
+  try {
+    await sendNtfy(
+      topic,
+      'Past You - ' + fmtDur(timer.duration) + ' ago',
+      text,
+      4,
+      delaySec
+    );
+    timer.scheduled = true;
+  } catch(e) {
+    btn.textContent = origLabel;
+    btn.disabled = false;
+    alert('Could not schedule the message:\n' + e.message + '\n\nNothing was set. Check your connection and try again.');
+    return;
+  }
 
   addTimer(timer);
   document.getElementById('msgTxt').value='';
   document.getElementById('charLeft').textContent='500';
+  btn.textContent = origLabel;
+  btn.disabled = false;
   render();
 
-  // Schedule delivery via setTimeout — sends ntfy when time is up
-  setTimeout(function(){ fireTimer(timer.id); }, durMs);
+  // Local fallback: also mark as delivered in the app's own history when the
+  // countdown ends (so the chat bubble appears). The REAL phone notification
+  // is already handled server-side by ntfy above.
+  setTimeout(function(){ markDeliveredLocal(timer.id); }, durMs);
 }
 
-async function fireTimer(id) {
+// Marks a timer delivered in local history only — does NOT send to ntfy
+// (ntfy already scheduled it server-side). Used to show the chat bubble.
+function markDeliveredLocal(id) {
   const t = deliverTimer(id);
-  if (!t) return;          // already delivered or deleted
+  if (!t) return;
   render();
-  showToast(t.text);
-
-  const topic = getTopic();
-  if (topic) {
-    try {
-      await sendNtfy(
-        topic,
-        '⏰ Past You (' + fmtDur(t.duration) + ' ago)',
-        t.text,
-        4
-      );
-    } catch(e) { console.warn('ntfy send failed:', e); }
-  }
+  if (!document.hidden) showToast(t.text);
 }
 
 function checkDeliveries() {
@@ -755,12 +786,13 @@ function init() {
     genTopic();   // pre-fill with a random topic
   }
 
-  // Re-schedule setTimeouts for any active timers (page reload recovery)
+  // Page-reload recovery: ntfy already has these scheduled server-side, so we
+  // only restore the LOCAL countdown + chat bubble — we do NOT re-send to ntfy.
   const now = Date.now();
   getTimers().filter(t=>!t.delivered).forEach(t=>{
     const delay = t.deliverAt - now;
-    if(delay>0) setTimeout(()=>fireTimer(t.id), delay);
-    else        fireTimer(t.id);  // overdue
+    if(delay>0) setTimeout(()=>markDeliveredLocal(t.id), delay);
+    else        markDeliveredLocal(t.id);  // overdue → show bubble now
   });
 
   setInterval(function(){ checkDeliveries(); updateClocks(); }, 1000);
